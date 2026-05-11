@@ -21,6 +21,10 @@ Minimal CLI to initialize modern Python projects for Data Science using `uv`.
 - Optional IDE auto-open:
   - Cursor
   - VSCode
+- Default project structure:
+  - src/
+  - notebooks/
+  - data/
 
 ---
 
