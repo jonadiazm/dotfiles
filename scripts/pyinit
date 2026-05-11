@@ -53,6 +53,10 @@ fi
 # venv
 [[ -d ".venv" ]] || uv venv
 
+# Project structure
+mkdir -p src notebooks data
+touch src/__init__.py
+
 # Base Data Science deps
 uv add numpy pandas matplotlib ipykernel
 
