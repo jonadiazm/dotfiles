@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_NAME=""
+IDE=""
+
+# Args:
+#   pyinit <project_name> [--ide cursor|vscode]
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --ide)
+      IDE="${2:-}"
+      shift 2
+      ;;
+    -*)
+      echo "❌ Unknown option: $1" >&2
+      exit 2
+      ;;
+    *)
+      if [[ -z "$PROJECT_NAME" ]]; then
+        PROJECT_NAME="$1"
+        shift
+      else
+        echo "❌ Unexpected argument: $1" >&2
+        exit 2
+      fi
+      ;;
+  esac
+done
+
+if [[ -n "$PROJECT_NAME" ]]; then
+  mkdir -p "$PROJECT_NAME"
+  cd "$PROJECT_NAME"
+fi
+
+# Checks
+for cmd in git uv; do
+  command -v "$cmd" >/dev/null 2>&1 || {
+    echo "❌ Missing command: $cmd" >&2
+    exit 1
+  }
+done
+
+# Git
+[[ -d ".git" ]] || git init
+
+# Project init
+if [[ ! -f "pyproject.toml" ]]; then
+  uv init .
+fi
+[[ -f "pyproject.toml" ]] || { echo "❌ pyproject.toml not created" >&2; exit 1; }
+
+# venv
+[[ -d ".venv" ]] || uv venv
+
+# Base Data Science deps
+uv add numpy pandas matplotlib ipykernel
+
+# Dev deps
+uv add --dev ruff pytest
+
+# .gitignore
+cat > .gitignore <<'EOF'
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+.venv/
+.env
+.env.*
+
+.ipynb_checkpoints/
+.pytest_cache/
+.coverage
+
+.ruff_cache/
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+EOF
+
+# Ruff config
+cat > ruff.toml <<'EOF'
+line-length = 120
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "W", "I", "B"]
+EOF
+
+# .vscode/settings.json (Ruff + formateo al guardar)
+mkdir -p .vscode
+cat > .vscode/settings.json <<'EOF'
+{
+    "ruff.enable": true,
+    "ruff.nativeServer": "on",
+    "ruff.importStrategy": "useBundled",
+    "ruff.lint.enable": true,
+    "ruff.organizeImports": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        }
+    }
+}
+EOF
+
+echo "✅ Python project initialized in $(pwd)"
+echo "Activate venv:"
+echo "  source .venv/Scripts/activate"
+
+# Open IDE
+if [[ -n "$IDE" ]]; then
+  case "$IDE" in
+    cursor)
+      command -v cursor >/dev/null 2>&1 || { echo "❌ cursor CLI not found" >&2; exit 1; }
+      cursor .
+      ;;
+    vscode|code)
+      command -v code >/dev/null 2>&1 || { echo "❌ code CLI not found" >&2; exit 1; }
+      code .
+      ;;
+    *)
+      echo "❌ Unknown IDE: $IDE (use cursor|vscode)" >&2
+      exit 2
+      ;;
+  esac
+fi
