@@ -116,6 +116,22 @@ cat > .vscode/settings.json <<'EOF'
 }
 EOF
 
+cat > .vscode/launch.json << 'EOF'
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run main.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
+EOF
+
 echo "✅ Python project initialized in $(pwd)"
 echo "Activate venv:"
 echo "  source .venv/Scripts/activate"
