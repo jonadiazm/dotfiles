@@ -7,38 +7,38 @@ IDE=""
 # Args:
 #   pyinit <project_name> [--ide cursor|vscode]
 while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --ide)
-      IDE="${2:-}"
-      shift 2
-      ;;
-    -*)
-      echo "❌ Unknown option: $1" >&2
-      exit 2
-      ;;
-    *)
-      if [[ -z "$PROJECT_NAME" ]]; then
-        PROJECT_NAME="$1"
-        shift
-      else
-        echo "❌ Unexpected argument: $1" >&2
-        exit 2
-      fi
-      ;;
-  esac
+    case "$1" in
+        --ide)
+            IDE="${2:-}"
+            shift 2
+        ;;
+        -*)
+            echo "❌ Unknown option: $1" >&2
+            exit 2
+        ;;
+        *)
+            if [[ -z "$PROJECT_NAME" ]]; then
+                PROJECT_NAME="$1"
+                shift
+            else
+                echo "❌ Unexpected argument: $1" >&2
+                exit 2
+            fi
+        ;;
+    esac
 done
 
 if [[ -n "$PROJECT_NAME" ]]; then
-  mkdir -p "$PROJECT_NAME"
-  cd "$PROJECT_NAME"
+    mkdir -p "$PROJECT_NAME"
+    cd "$PROJECT_NAME"
 fi
 
 # Checks
 for cmd in git uv; do
-  command -v "$cmd" >/dev/null 2>&1 || {
-    echo "❌ Missing command: $cmd" >&2
-    exit 1
-  }
+    command -v "$cmd" >/dev/null 2>&1 || {
+        echo "❌ Missing command: $cmd" >&2
+        exit 1
+    }
 done
 
 # Git
@@ -46,7 +46,7 @@ done
 
 # Project init
 if [[ ! -f "pyproject.toml" ]]; then
-  uv init .
+    uv init .
 fi
 [[ -f "pyproject.toml" ]] || { echo "❌ pyproject.toml not created" >&2; exit 1; }
 
@@ -118,18 +118,18 @@ echo "  source .venv/Scripts/activate"
 
 # Open IDE
 if [[ -n "$IDE" ]]; then
-  case "$IDE" in
-    cursor)
-      command -v cursor >/dev/null 2>&1 || { echo "❌ cursor CLI not found" >&2; exit 1; }
-      cursor .
-      ;;
-    vscode|code)
-      command -v code >/dev/null 2>&1 || { echo "❌ code CLI not found" >&2; exit 1; }
-      code .
-      ;;
-    *)
-      echo "❌ Unknown IDE: $IDE (use cursor|vscode)" >&2
-      exit 2
-      ;;
-  esac
+    case "$IDE" in
+        cursor)
+            command -v cursor >/dev/null 2>&1 || { echo "❌ cursor CLI not found" >&2; exit 1; }
+            cursor .
+        ;;
+        vscode|code)
+            command -v code >/dev/null 2>&1 || { echo "❌ code CLI not found" >&2; exit 1; }
+            code .
+        ;;
+        *)
+            echo "❌ Unknown IDE: $IDE (use cursor|vscode)" >&2
+            exit 2
+        ;;
+    esac
 fi
