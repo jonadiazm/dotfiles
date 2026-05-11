@@ -125,11 +125,11 @@ if [[ -n "$IDE" ]]; then
     case "$IDE" in
         cursor)
             command -v cursor >/dev/null 2>&1 || { echo "❌ cursor CLI not found" >&2; exit 1; }
-            cursor .
+            cursor -n .
         ;;
         vscode|code)
             command -v code >/dev/null 2>&1 || { echo "❌ code CLI not found" >&2; exit 1; }
-            code .
+            code -n .
         ;;
         *)
             echo "❌ Unknown IDE: $IDE (use cursor|vscode)" >&2
